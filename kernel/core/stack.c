@@ -16,6 +16,6 @@ void stack_trace(offset_t from)
    {
       eip = (offset_t*)(*(ebp+1));
       ebp = (offset_t*)(*ebp);
-      printf("%p\n", (offset_t)eip);
+      printf("%p\n", (void*)eip);
    }
 }
