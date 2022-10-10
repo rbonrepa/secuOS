@@ -9,9 +9,9 @@
 #define  va_arg(v,l)             __builtin_va_arg(v,l)
 typedef  __builtin_va_list       va_list;
 
-void     panic(const char*, ... );
-size_t   printf(const char*, ... );
-size_t   snprintf(char*, size_t, const char*, ...);
+void     panic(const char*, ... ) __attribute__ ((__format__(printf, 1, 2)));
+size_t   printf(const char*, ... ) __attribute__ ((__format__(printf, 1, 2)));
+size_t   snprintf(char*, size_t, const char*, ...) __attribute__ ((__format__(printf, 1, 3)));
 
 size_t   __vprintf(const char*, va_list);
 size_t   __vsnprintf(char*, size_t, const char*, va_list);
