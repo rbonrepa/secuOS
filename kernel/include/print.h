@@ -11,7 +11,7 @@ typedef  __builtin_va_list       va_list;
 
 void     panic(const char*, ... ) __attribute__ ((__format__(printf, 1, 2)));
 size_t   printf(const char*, ... ) __attribute__ ((__format__(printf, 1, 2)));
-size_t   snprintf(char*, size_t, const char*, ...) __attribute__ ((__format__(printf, 1, 3)));
+size_t   snprintf(char*, size_t, const char*, ...) __attribute__ ((__format__(printf, 1, 4)));
 
 size_t   __vprintf(const char*, va_list);
 size_t   __vsnprintf(char*, size_t, const char*, va_list);
