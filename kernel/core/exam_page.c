@@ -1,66 +1,85 @@
 #include <exam_page.h>
 #include <debug.h>
-#include <cr.h>
 
-void show_cr3()
+extern info_t *info;
+
+void display_pte(pte32_t *pte, uint32_t offset)
 {
-   // cr3_reg_t * cr3 = (cr3_reg_t *)get_cr3();
-   // debug("CR3 = %p\n", *cr3);
+   for (uint32_t i = 0; i < 3; i++)
+   {
+      if (pte[i].addr > 0)
+      {
+         printf("-- (%d) : Virtuelle : 0x%x -> Physique : 0x%x\n", i, (i | (offset << 10)) << 12, pte[i].addr << 12);
+      }
+   }
+}
 
-   // cr3_reg_t cr3 = {.raw = get_cr3()};
-   // debug("CR3 = %p\n", cr3.raw);
+void display_pgd(pde32_t *pgd)
+{
+   debug("---Display PGD---\n");
+   printf("Address PGD : %p\n", (void *)pgd);
+
+   for (uint32_t i = 0; i < PDE32_PER_PD; i++)
+   {
+      if (pgd[i].addr > 0)
+      {
+         printf("- Index : %d Address PTB : 0x%x\n", i, pgd[i].addr << 12);
+         display_pte((pte32_t *)(pgd[i].addr << 12), i);
+      }
+   }
 }
 
 void enable_paging()
 {
    uint32_t cr0 = get_cr0();
-   set_cr0(cr0|CR0_PG);
+   set_cr0(cr0 | CR0_PG);
+}
+
+void init_pages(pde32_t *pgd, pte32_t *ptb, int lvl)
+{
+   memset((void *)pgd, 0, PAGE_SIZE);
+   for (uint32_t i_pgd = 0; i_pgd < PDE32_PER_PD; i_pgd++)
+   {
+      pg_set_entry(&pgd[i_pgd], lvl | PG_RW, page_nr(&ptb[i_pgd * PTE32_PER_PT]));
+      for (uint32_t i_ptb = 0; i_ptb < PTE32_PER_PT; i_ptb++)
+      {
+         pg_set_entry(&ptb[i_ptb + i_pgd * PTE32_PER_PT], lvl | PG_RW, i_ptb + i_pgd * 1024);
+      }
+   }
 }
 
 void identity_init()
 {
-   // int      i;
-   // pde32_t *pgd = (pde32_t*)address_PGD;
-   // pte32_t *ptb = (pte32_t*)address_PTB;
 
-   // for(i=0;i<1024;i++)
-      // pg_set_entry(&ptb[i], PG_KRN|PG_RW, i);
+   pde32_t *pgd_kernel = (pde32_t *)address_PGD_kernel;
+   pde32_t *pgd_user1 = (pde32_t *)address_PGD_usr1;
+   pde32_t *pgd_user2 = (pde32_t *)address_PGD_usr2;
 
-   // memset((void*)pgd, 0, PAGE_SIZE);
-   // pg_set_entry(&pgd[0], PG_KRN|PG_RW, page_nr(ptb));
+   pte32_t *ptbs_kernel = (pte32_t *)0xf00000; // taille PTBS = 0x100000
+   pte32_t *ptbs_user1 = (pte32_t *)0xb00000;
+   pte32_t *ptbs_user2 = (pte32_t *)0x900000;
 
-   // pte32_t *ptb2 = (pte32_t*)0x602000;
-   // for(i=0;i<1024;i++)
-   //    pg_set_entry(&ptb2[i], PG_KRN|PG_RW, i+1024);
+   init_pages(pgd_kernel, ptbs_kernel, PG_KRN);
+   init_pages(pgd_user1, ptbs_user1, PG_USR);
+   init_pages(pgd_user2, ptbs_user2, PG_USR);
 
-   // pg_set_entry(&pgd[1], PG_KRN|PG_RW, page_nr(ptb2));
+   set_cr3(pgd_kernel);
+   enable_paging();
 
-   // set_cr3((uint32_t)pgd);
-   // enable_paging();
+   pg_set_entry(pgd_user1, PG_KRN | PG_RW, 0xfff);
 
-   // debug("PTB[1] = %p\n", ptb[1].raw);
+   int pgd_index = pd32_idx(shared_mem);
+   int ptb_index = pt32_idx(shared_mem);
 
-   // pte32_t  *ptb3    = (pte32_t*)0x603000;
-   // uint32_t *target  = (uint32_t*)0xc0000000;
-   // int      pgd_idx = pd32_idx(target);
-   // int      ptb_idx = pt32_idx(target);
+   // Adress, RW,
+   pg_set_entry(&ptbs_user1[1023 * 1024 + 1021], PG_KRN | PG_RW, 1021 + (1023 << 10));
+   pg_set_entry(&ptbs_user2[1023 * 1024 + 1023], PG_KRN | PG_RW, 1023 + (1023 << 10));
 
-   // memset((void*)ptb3, 0, PAGE_SIZE);
-   // pg_set_entry(&ptb3[ptb_idx], PG_KRN|PG_RW, page_nr(pgd));
-   // pg_set_entry(&pgd[pgd_idx], PG_KRN|PG_RW, page_nr(ptb3));
+   debug("PGDuser1[0] = %p | target = %p\n", (void *)pgd_user1[0].raw, (void *)*shared_mem);
+   debug("PGDuser2[0] = %p | target = %p\n", (void *)pgd_user2[0].raw, (void *)*shared_mem);
 
-   // debug("PGD[0] = %p | target = %p\n", pgd[0].raw, *target);
-
-   // char *v1 = (char*)0x700000;
-   // char *v2 = (char*)0x7ff000;
-
-   // ptb_idx = pt32_idx(v1);
-   // pg_set_entry(&ptb2[ptb_idx], PG_KRN|PG_RW, 2);
-
-   // ptb_idx = pt32_idx(v2);
-   // pg_set_entry(&ptb2[ptb_idx], PG_KRN|PG_RW, 2);
-
-   // debug("%p = %s | %p = %s\n", v1, v1, v2, v2);
-
-   // *target = 0;
+   *shared_mem = 0;
+   debug("%p = %d | %p = %d\n", (void *)v1, *v1, (void *)v2, *v2);
+   *shared_mem = 3;
+   debug("%p = %d | %p = %d\n", (void *)v1, *v1, (void *)v2, *v2);
 }
