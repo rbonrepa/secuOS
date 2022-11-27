@@ -64,27 +64,34 @@ void identity_init()
 
    // display_pgd(pgd_user2);
 
-   uint32_t *test_shm = (uint32_t *)0x10000000;
-   // debug("Offset pgd : %d\n", (int)pd32_idx(test_shm));
-   // debug("Offset ptb : %d\n", (int)pt32_idx(test_shm));
+   // uint32_t *v1 = (uint32_t *)0x548000;
+   // uint32_t *test_shm = (uint32_t *)0x230000;
 
-   // debug("Page number pgd : %d\n", (int)page_nr((int)pd32_idx(test_shm)));
-   // debug("Page number ptb : %d\n", (int)page_nr((int)pt32_idx(test_shm)));
+   // int page_index_shared_v1 = pt32_idx(v1);
 
-   pg_set_entry(&pgd_user1[1], PG_KRN | PG_RW, 0);
-   pg_set_entry(&pgd_user1[2], PG_KRN | PG_RW, page_nr(test_shm));
+   // debug("Page index : %d\n", page_index_shared_v1);
+   // pg_set_entry(&ptbs_user1[page_index_shared_v1], PG_USR | PG_RW, (uint32_t)test_shm >> 12);
 
-   pg_set_entry(&pgd_user2[0], PG_KRN | PG_RW, 0);
-   pg_set_entry(&pgd_user2[2], PG_KRN | PG_RW, page_nr(test_shm));
+   // debug("ptbs à l'index page_index_shared : %x\n", ptbs_user1[page_index_shared_v1].addr);
 
-   *test_shm = 6;
+   // *test_shm = 6;
+
+   uint32_t *shared_test_mem = (uint32_t *)0x3;
+   uint32_t *v1 = (uint32_t *)0x777000;
+
+   int index = pt32_idx(v1);
+   pg_set_entry(&ptbs_user1[index], PG_USR | PG_RW, (uint32_t)shared_test_mem);
+
+   *shared_test_mem = 6;
+
    set_cr3(pgd_user1);
    enable_paging();
 
-   uint32_t *v1 = (uint32_t *)0x010200;
-   // // uint32_t *v2 = (uint32_t *)0x000200;
-   // set_cr3(pgd_user1);
-   debug("@v1 : %p , valeur v1 : %d\n", v1, *v1);
+   debug("*sharedtestmem = %d, *v1 = %d\n", *shared_test_mem, *v1);
+
+   //  // uint32_t *v2 = (uint32_t *)0x000200;
+   //  set_cr3(pgd_user1);
+   // debug("@test_shm : %p , valeur test_shm : %d\n", v1, *v1);
    // set_cr3(pgd_user2);
    // debug("@v2 : %p , valeur v2 : %d\n", v2, *v2);
 }
