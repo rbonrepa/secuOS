@@ -1,8 +1,6 @@
 #include <exam_interrup.h>
 #include <segmem.h>
 #include <intr.h>
-#include <exam_task.h>
-
 #include <exam_segment.h>
 
 void init_interrup(int num_inter, int privilege, offset_t handler)
@@ -38,6 +36,7 @@ __attribute__((naked)) void kernel_handler()
 // Syscall pour changer de task
 __attribute__((naked)) void user_handler()
 {
+    /*
     // Affecter ces variables avec quelque chose
     task_t *task = &task[current_task];
     tss_t *tss;
@@ -49,4 +48,5 @@ __attribute__((naked)) void user_handler()
     asm volatile("add $8, %esp"); // skip int number end error code
     asm volatile("iret");
     // AU secours
+    */
 }
