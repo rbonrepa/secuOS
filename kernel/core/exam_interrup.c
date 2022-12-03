@@ -1,7 +1,6 @@
 #include <exam_interrup.h>
-#include <segmem.h>
 #include <intr.h>
-#include <exam_segment.h>
+#include <debug.h>
 
 void init_interrup(int num_inter, int privilege, offset_t handler)
 {
@@ -30,24 +29,25 @@ __attribute__((naked)) void kernel_handler()
         "pusha          \n"
         : "=r"(counter));
 
-    debug("Compteur = %d",counter);
+    debug("Compteur = %d", counter);
     asm volatile("popa; leave; iret");
 }
 
 // Syscall pour changer de task
 __attribute__((naked)) void user_handler()
 {
-    /*
+
+    current_task_index = (current_task_index + 1) % 2;
     // Affecter ces variables avec quelque chose
-    task_t *task = &task[current_task];
-    tss_t *tss;
-    tss->s0.esp;
-    tss->s0.ss;
-    set_esp();
+    task_t *task = &tasks[current_task_index];
     set_cr3(task->pgd);
+    // tss_t *tss;
+    //  tss->s0.esp;
+    //  tss->s0.ss;
+    //  set_esp();
     asm volatile("popa");         // pop general registers and EBP
     asm volatile("add $8, %esp"); // skip int number end error code
     asm volatile("iret");
     // AU secours
-    */
+    debug("LOL\n");
 }
