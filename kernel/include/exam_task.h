@@ -1,5 +1,7 @@
 #ifndef EXAM_TASK
 #define EXAM_TASK
+#include <types.h>
+#include <exam_layout.h>
 
 #define NB_TASKS 2
 #define INDEX_TASK_USER1 0
@@ -12,9 +14,8 @@ typedef struct
     uint32_t pgd;
 } task_t;
 
-task_t tasks[NB_TASKS];
-
-int current_task_index = 0;
+extern task_t tasks[NB_TASKS];
+extern int current_task_index;
 
 void __attribute__((section(".user"))) user1();
 void __attribute__((section(".user"))) user2();
