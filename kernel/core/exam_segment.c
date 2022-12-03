@@ -4,7 +4,8 @@
 #include <info.h>
 
 extern info_t *info;
-
+tss_t *TSS;
+seg_desc_t GDT[6];
 #define gdt_flat_dsc(_dSc_, _pVl_, _tYp_) \
    ({                                     \
       (_dSc_)->raw = 0;                   \

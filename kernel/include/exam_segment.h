@@ -1,7 +1,7 @@
 #ifndef EXAM_SEGMENT
 #define EXAM_SEGMENT
 #include <string.h>
-#include <exam_layout.h>
+#include <segmem.h>
 
 #define c0_idx 1
 #define d0_idx 2
@@ -16,6 +16,8 @@
 #define ts_sel gdt_krn_seg_sel(ts_idx)
 // #define address_GDT 0x10000
 // #define address_TSS 0x400000
+extern tss_t *TSS;
+extern seg_desc_t GDT[6];
 
 void display_gdt(void);
 void init_gdt();

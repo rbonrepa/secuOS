@@ -1,6 +1,8 @@
 #include <exam_interrup.h>
 #include <intr.h>
 #include <debug.h>
+#include <exam_segment.h>
+#include <exam_task.h>
 
 void init_interrup(int num_inter, int privilege, offset_t handler)
 {
@@ -41,8 +43,7 @@ __attribute__((naked)) void user_handler()
     // Affecter ces variables avec quelque chose
     task_t *task = &tasks[current_task_index];
     set_cr3(task->pgd);
-    // tss_t *tss;
-    //  tss->s0.esp;
+    TSS->s0.esp = 0x00;
     //  tss->s0.ss;
     //  set_esp();
     asm volatile("popa");         // pop general registers and EBP

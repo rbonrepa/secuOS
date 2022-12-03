@@ -1,11 +1,7 @@
 #ifndef EXAM_LAYOUT
 #define EXAM_LAYOUT
-#include <segmem.h>
 
 #define sizePTB 0x1000
-
-tss_t *TSS;
-seg_desc_t GDT[6];
 
 #define address_PGD_kernel (pde32_t *)0x100000 // taille PGD  = 0x400
 #define address_PGD_usr1 (pde32_t *)0x101000
