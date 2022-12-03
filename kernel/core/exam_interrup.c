@@ -23,6 +23,7 @@ void init_all_interrup()
 }
 
 // Syscall pour afficher la valeur du compteur
+// Interface Noyau
 __attribute__((naked)) void kernel_handler()
 {
     uint32_t counter;
@@ -31,7 +32,7 @@ __attribute__((naked)) void kernel_handler()
         "pusha          \n"
         : "=r"(counter));
 
-    // debug("Compteur = %d",counter);
+    debug("Compteur = %d",counter);
     asm volatile("popa; leave; iret");
 }
 
