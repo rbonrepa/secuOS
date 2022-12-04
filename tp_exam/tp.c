@@ -6,6 +6,7 @@
 #include <exam_page.h>
 #include <exam_task.h>
 #include <exam_interrup.h>
+#include <asm.h>
 
 extern info_t *info;
 extern uint32_t __kernel_start__;
@@ -32,6 +33,13 @@ void tp()
 
     debug("---Initialisation Tâches---\n");
     init_tasks();
+
+    // force_interrupts_on();
+    // asm volatile("int $80");
+
+    uint32_t* var = (uint32_t*)0x890000;
+    *var = 12;
+    sys_counter(var);
 
     while(1){}
 }
