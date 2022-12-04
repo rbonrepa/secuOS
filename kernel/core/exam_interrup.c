@@ -11,15 +11,14 @@ extern task_t tasks[NB_TASKS];
 // Interface Noyau
 __attribute__((naked)) __regparm__(1) void kernel_handler(int_ctx_t *ctx)
 {
-    debug("ctx : %x\n", ctx->gpr.eax.raw);
     uint32_t counter;
     asm volatile(
         "mov %%eax, %0  \n"
         "pusha          \n"
         : "=r"(counter));
-
-    debug("Compteur = %d", counter);
-    asm volatile("popa; leave; iret");
+    debug("counter : %d\n", counter);
+    debug("%x\n", ctx->gpr.eax.raw);
+    asm volatile("popa;leave;iret");
 }
 
 // Syscall pour changer de task
@@ -32,7 +31,7 @@ __attribute__((naked)) __regparm__(1) void user_handler(int_ctx_t *ctx)
 
     if (current_task_index == -1)
     {
-        current_task_index = 1;
+        current_task_index = 0;
     }
     else
     {
@@ -40,7 +39,9 @@ __attribute__((naked)) __regparm__(1) void user_handler(int_ctx_t *ctx)
         tasks[current_task_index].esp_kernel = (uint32_t)ctx;
         asm volatile("mov (%%esp), %0"
                      : "=r"(tasks[current_task_index].esp_kernel));
+
         current_task_index = (current_task_index + 1) % 2;
+
         asm volatile("mov %0, %%esp" ::"r"(tasks[current_task_index].esp_kernel));
     }
 
@@ -59,14 +60,15 @@ __attribute__((naked)) __regparm__(1) void user_handler(int_ctx_t *ctx)
 
     asm volatile(
         "push %0          \n"
-        "push %%ebp       \n"
+        "push %1          \n"
         "pushf            \n"
         "push %2          \n"
-        "push %%ebx       \n"
-        "iret             \n" ::"i"(d3_sel),
+        "push %%ebx       \n" ::"i"(d3_sel),
         "r"(task->esp_user),
         "i"(c3_sel),
         "b"((void *)task->eip));
+    debug("Code sale");
+    asm volatile("iret");
 }
 
 void init_interrup(int num_inter, int privilege, offset_t handler)

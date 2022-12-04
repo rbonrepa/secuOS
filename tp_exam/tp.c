@@ -26,8 +26,6 @@ void tp()
     // while (1)
     // {
     // }
-    // debug("---Display PDG User1---\n");
-    // display_pgd(address_PGD_usr1);
 
     debug("---Initialisation Interruptions---\n");
     init_all_interrup();
@@ -38,13 +36,15 @@ void tp()
     debug("---Initialisation Pages---\n");
     page_init();
 
-    // force_interrupts_on();
-    // asm volatile("int $80");
+    // debug("---Display PGD User1---\n");
+    // display_pgd(address_PGD_usr1);
 
-    uint32_t *var = (uint32_t *)0x890000;
-    *var = 12;
-    sys_counter(var);
-
+    force_interrupts_on();
+    //  asm volatile("int $80");
+    // uint32_t *var = (uint32_t *)0x890000;
+    // *var = 78;
+    // // asm volatile("int $32");
+    // sys_counter(var);
     while (1)
     {
     }
