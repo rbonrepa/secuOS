@@ -5,7 +5,7 @@
 #include <info.h>
 
 void init_all_interrup();
-void __regparm__(1) kernel_handler(int_ctx_t * ctx);
-void user_handler();
+__regparm__(1) void kernel_handler();
+__regparm__(1) void user_handler();
 
 #endif
