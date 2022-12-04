@@ -1,6 +1,7 @@
 /* GPLv2 (c) Airbus */
 #include <debug.h>
 #include <info.h>
+#include <asm.h>
 
 #include <exam_segment.h>
 #include <exam_page.h>
@@ -32,6 +33,8 @@ void tp()
 
     debug("---Initialisation Tâches---\n");
     init_tasks();
-
-    while(1){}
+    force_interrupts_on();
+    while (1)
+    {
+    }
 }
