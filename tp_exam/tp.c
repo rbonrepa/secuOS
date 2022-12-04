@@ -22,9 +22,9 @@ void tp()
     init_gdt();
     // debug("---Display GDT---\n");
     // display_gdt();
-
-    debug("---Initialisation Pages---\n");
-    page_init();
+    // while (1)
+    // {
+    // }
     // debug("---Display PDG User1---\n");
     // display_pgd(address_PGD_usr1);
 
@@ -33,6 +33,9 @@ void tp()
 
     debug("---Initialisation Tâches---\n");
     init_tasks();
+
+    debug("---Initialisation Pages---\n");
+    page_init();
     force_interrupts_on();
     while (1)
     {
