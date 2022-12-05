@@ -39,12 +39,16 @@ void tp()
     // debug("---Display PGD User1---\n");
     // display_pgd(address_PGD_usr1);
 
-    force_interrupts_on();
-    //  asm volatile("int $80");
-    // uint32_t *var = (uint32_t *)0x890000;
-    // *var = 78;
-    // // asm volatile("int $32");
-    // sys_counter(var);
+    // force_interrupts_on();
+
+    
+    uint32_t *var = (uint32_t *)0x890000;
+    *var = 78;
+    sys_counter(var);
+
+    asm volatile("int $32");
+    // asm volatile("int $80");
+
     while (1)
     {
     }
