@@ -13,6 +13,7 @@ typedef struct
     uint32_t esp_kernel;
     uint32_t esp_user;
     uint32_t pgd;
+    int state;
 } task_t;
 
 extern task_t tasks[NB_TASKS];

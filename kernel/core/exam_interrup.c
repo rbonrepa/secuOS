@@ -29,36 +29,12 @@ __attribute__((naked)) __regparm__(1) void user_handler(int_ctx_t *ctx)
     debug("Changement de task\n");
     task_t *task;
 
+    // Passage ring 0->3
     if (current_task_index == -1)
     {
         current_task_index = 0;
-    }
-    else
-    {
-        // Sauvegarder contexte ?
-        tasks[current_task_index].esp_kernel = (uint32_t)ctx;
-        asm volatile("mov (%%esp), %0"
-                     : "=r"(tasks[current_task_index].esp_kernel));
-
-        current_task_index = (current_task_index + 1) % 2;
-
-        asm volatile("mov %0, %%esp" ::"r"(tasks[current_task_index].esp_kernel));
-    }
-
-    task = &tasks[current_task_index];
-    debug("Set esp, esp_kernel user : %x\n", task->esp_kernel);
-    debug("esp_user user : %x\n", task->esp_user);
-    set_esp(task->esp_kernel);
-
-    tss_t *TSS = (tss_t *)address_TSS;
-    TSS->s0.esp = task->esp_kernel;
-    TSS->s0.ss = gdt_krn_seg_sel(1);
-    TSS->eip = task->eip;
-
-    debug("Set cr3\n");
-    set_cr3(task->pgd);
-
-    asm volatile(
+        set_cr3(tasks[0].pgd);
+        asm volatile(
         "push %0          \n"
         "push %1          \n"
         "pushf            \n"
@@ -67,8 +43,27 @@ __attribute__((naked)) __regparm__(1) void user_handler(int_ctx_t *ctx)
         "r"(task->esp_user),
         "i"(c3_sel),
         "b"((void *)task->eip));
-    debug("Code sale");
-    asm volatile("iret");
+        asm volatile("iret");
+    }
+    else
+    {
+        current_task_index = (current_task_index + 1) % 2;
+        task = &tasks[current_task_index];
+        if (task->state == 0){
+            ctx->esp = task->esp_user;                
+            ctx->eip = task->eip;
+            task->state = 1;
+        }
+        else{
+            tasks[(current_task_index + 1) % 2].esp_kernel = (uint32_t)ctx;
+            *ctx = task->esp_kernel;
+        }
+        tss_t *TSS = (tss_t *)address_TSS;
+        TSS->s0.esp = task->esp_kernel;
+        set_esp(task->esp_kernel);
+        set_cr3(task->pgd);
+        asm volatile("iret");
+    }
 }
 
 void init_interrup(int num_inter, int privilege, offset_t handler)
