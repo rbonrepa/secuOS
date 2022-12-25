@@ -17,3 +17,33 @@ set_gs(0x10)
 
 le 0x08 c'est le 1er element du gdt (le 0 est vide) il correspond au code
 le 0x10 = 2eme elem et correspond à la donnée
+
+
+/* Page Table (PTB)
+void set_pte(pte32_t * adr_pte, int offset)
+{
+    adr_pte->p = 1;
+    adr_pte->rw = 1;
+    adr_pte->lvl = 0;
+    adr_pte->pwt = 0;
+    adr_pte->pcd = 0;
+    adr_pte->acc = 0;
+    adr_pte->d = 0;
+    adr_pte->pat = 0;
+    adr_pte->g = 0;
+    adr_pte->avl = 0;
+    adr_pte->addr = offset;
+}
+// Page Directory (PGD)
+void set_pde(pde32_t * adr_pde)
+{
+    adr_pde->p=1;
+    adr_pde->rw=1;
+    adr_pde->lvl=0;
+    adr_pde->pwt=0;
+    adr_pde->pcd=0;
+    adr_pde->acc=0;
+    adr_pde->mbz=0;
+    adr_pde->avl=0;
+    adr_pde->addr=0; // adresse de la première PTB
+}*/
