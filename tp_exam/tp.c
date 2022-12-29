@@ -21,11 +21,6 @@ void tp()
 
     debug("---Initialisation GDT---\n");
     init_gdt();
-    // debug("---Display GDT---\n");
-    // display_gdt();
-    // while (1)
-    // {
-    // }
 
     debug("---Initialisation Interruptions---\n");
     init_all_interrup();
